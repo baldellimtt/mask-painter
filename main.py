@@ -56,11 +56,14 @@ def draw_circle(event, x, y, flags, param):
 # --- Elaborazione immagini ---
 image_files = [f for f in os.listdir(images_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
-for index, img_name in enumerate(image_files, 1):
+index = 0
+while index < len(image_files):
+    img_name = image_files[index]
     img_path = os.path.join(images_folder, img_name)
     img = cv2.imread(img_path)
     if img is None:
         print(f"Impossibile leggere {img_name}")
+        index += 1
         continue
 
     mask_path = os.path.join(masks_folder, img_name)
@@ -82,7 +85,7 @@ for index, img_name in enumerate(image_files, 1):
 
     cursor_x, cursor_y = -1, -1
 
-    window_name = f"{img_name} ({index}/{len(image_files)})"
+    window_name = f"{img_name} ({index+1}/{len(image_files)})"
     cv2.namedWindow(window_name)
     cv2.setMouseCallback(window_name, draw_circle)
 
@@ -144,6 +147,12 @@ for index, img_name in enumerate(image_files, 1):
             print(f"Maschera salvata: {mask_path}")
         elif key == ord('q'):
             break
+        elif key == ord('w'):
+            if index > 0:
+                index -= 2  # vai indietro di una immagine netta
+                break
+            else:
+                print("Already at the first image.")
         elif key == 27:
             print("\nSei sicuro di voler uscire? (y/n): ", end='', flush=True)
             cv2.destroyAllWindows()
@@ -155,5 +164,6 @@ for index, img_name in enumerate(image_files, 1):
                 cv2.setMouseCallback(window_name, draw_circle)
 
     cv2.destroyWindow(window_name)
+    index += 1
 
 print("Fatto!")
