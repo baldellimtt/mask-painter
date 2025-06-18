@@ -24,6 +24,7 @@
 | `c` | Draw or erase a filled circle at cursor position |
 | `s` | Save the mask |
 | `q` | Move to the next image |
+| `w` | Move to the previous image |
 | `Esc` | Confirm exit |
 
 ## Requirements
