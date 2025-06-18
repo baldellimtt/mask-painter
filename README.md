@@ -2,6 +2,10 @@
 
 **Mask Painter** is an interactive tool to easily draw and edit binary masks for images.
 
+<p align="center">
+  <img src="https://www.sentireascoltare.com/wp-content/uploads/2017/05/twin-peaks-e1494510660493.jpg" alt="Logo TensorFlow" width="500"/>
+</p>
+
 ## Features
 
 - Freehand brush with adjustable size
