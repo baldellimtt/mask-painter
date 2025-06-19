@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 from tkinter import Tk, filedialog
+from collections import deque  # <-- aggiunto per gli stack Undo/Redo
 
 # --- Seleziona cartelle ---
 Tk().withdraw()
@@ -25,13 +26,37 @@ pan_start = (0, 0)
 
 cursor_x, cursor_y = -1, -1
 
+# --- Undo/Redo stacks ---
+undo_stack = deque(maxlen=20)  # salva fino a 20 stati precedenti
+redo_stack = deque(maxlen=20)
+
+# --- Funzione per push stato maschera ---
+def push_undo(mask):
+    undo_stack.append(mask.copy())
+    redo_stack.clear()
+
+# --- Funzione Undo ---
+def do_undo():
+    if undo_stack:
+        redo_stack.append(mask.copy())
+        return undo_stack.pop()
+    return None
+
+# --- Funzione Redo ---
+def do_redo():
+    if redo_stack:
+        undo_stack.append(mask.copy())
+        return redo_stack.pop()
+    return None
+
 def draw_circle(event, x, y, flags, param):
-    global drawing, erase_mode, scale, offset_x, offset_y, panning, pan_start, cursor_x, cursor_y
+    global drawing, erase_mode, scale, offset_x, offset_y, panning, pan_start, cursor_x, cursor_y, mask
 
     cursor_x, cursor_y = x, y
 
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
+        push_undo(mask)  # Salva stato prima di modificare
     elif event == cv2.EVENT_MOUSEMOVE:
         if drawing:
             x_corr = int((x - offset_x) / scale)
@@ -118,7 +143,16 @@ while index < len(image_files):
         cv2.imshow(window_name, canvas)
 
         key = cv2.waitKey(1) & 0xFF
-        if key == ord('+') or key == ord('='):
+        # --- Undo/Redo con Ctrl+Z e Ctrl+Y ---
+        if key == 26:  # Ctrl+Z
+            prev = do_undo()
+            if prev is not None:
+                mask = prev
+        elif key == 25:  # Ctrl+Y
+            next_mask = do_redo()
+            if next_mask is not None:
+                mask = next_mask
+        elif key == ord('+') or key == ord('='):
             brush_size += 2
         elif key == ord('-') and brush_size > 2:
             brush_size -= 2
@@ -135,6 +169,7 @@ while index < len(image_files):
             offset_x, offset_y = 0, 0
         elif key == ord('c'):
             if cursor_x >= 0 and cursor_y >= 0:
+                push_undo(mask)  # Salva stato prima di modificare
                 x_corr = int((cursor_x - offset_x) / scale)
                 y_corr = int((cursor_y - offset_y) / scale)
                 if 0 <= x_corr < mask.shape[1] and 0 <= y_corr < mask.shape[0]:

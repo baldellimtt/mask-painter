@@ -14,6 +14,7 @@
 - Visible brush cursor with live size preview
 - Draw filled circles with a single click
 - Save masks to a separate folder with the same filenames as the input images
+- **Undo/Redo for mask editing (Ctrl+Z / Ctrl+Y)**
 
 ## Keyboard Shortcuts
 
@@ -30,6 +31,8 @@
 | `q` | Move to the next image |
 | `w` | Move to the previous image |
 | `Esc` | Confirm exit |
+| `Ctrl+Z` | Undo last mask modification |
+| `Ctrl+Y` | Redo mask modification |
 
 ## Requirements
 
